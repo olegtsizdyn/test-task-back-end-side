@@ -4,7 +4,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const fileupload = require('express-fileupload');
-const cors = require('cors');
 const fs = require('fs');
 
 const MONGO_DB_URL = process.env.DATABASE_URL;
@@ -19,7 +18,6 @@ app.use(fileupload({
   useTempFiles : true,
   tempFileDir : './upload'
 }));
-app.use(cors());
 
 mongoose.connect(MONGO_DB_URL);
 const db = mongoose.connection;
@@ -35,6 +33,8 @@ db.once('open', () => {
 });
 
 app.post("/api/randomimage", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   if (!req?.files || !req?.files?.file) {
     res.send({
       success: false,
@@ -66,6 +66,8 @@ app.post("/api/randomimage", (req, res) => {
 });
 
 app.get('/api/randomimage', (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   db.collection('images').find().toArray()
     .then(collection => {
       if (!collection.length) {
@@ -91,6 +93,8 @@ app.get('/api/randomimage', (req, res) => {
 })
 
 app.delete('/api/randomimage/:id', (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   db.collection('images').deleteOne({_id: mongoose.Types.ObjectId(req.params.id)})
     .then(() => {
       res.send({
