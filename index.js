@@ -20,6 +20,8 @@ app.use(fileupload({
 }));
 
 app.post("/api/randomimage", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   if (!req.files || !req.files.file) {
     res.send('File field is required');
     return;
@@ -45,6 +47,8 @@ app.post("/api/randomimage", (req, res) => {
 
 
 app.get('/api/randomimage', (req, res)=>{
+  res.header("Access-Control-Allow-Origin", "*");
+
   db.collection('images').find().toArray()
     .then(collection => {
       randomImage = collection[Math.floor((Math.random() * collection.length))]
