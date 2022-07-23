@@ -19,47 +19,6 @@ app.use(fileupload({
   tempFileDir : './upload'
 }));
 
-app.post("/api/randomimage", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-
-  if (!req.files || !req.files.file) {
-    res.send('File field is required');
-    return;
-  }
-
-  db.collection('images')
-    .insertOne({
-      name: req.files.file.name,
-      size: req.files.file.size,
-      contentType: req.files.file.mimetype,
-      image: new Buffer.from(fs.readFileSync(req.files.file.tempFilePath).toString('base64'), 'base64'),
-      url: req.protocol + '://' + req.get("host") + '/images/' + req.files.file.name,
-    })
-    .then(() => {
-      res.send('Image has benn upload successfully');
-
-      fs.rmSync('./upload', { recursive: true, force: true });
-    })
-    .catch(() => {
-      res.send('Something went wrong with upload file');
-    })
-});
-
-
-app.get('/api/randomimage', (req, res)=>{
-  res.header("Access-Control-Allow-Origin", "*");
-
-  db.collection('images').find().toArray()
-    .then(collection => {
-      randomImage = collection[Math.floor((Math.random() * collection.length))]
-
-      res.send(randomImage)
-    })
-    .catch(() => {
-      res.send('Something went wrong with upload file');
-    })
-})
-
 mongoose.connect(MONGO_DB_URL);
 const db = mongoose.connection;
 db.on('error', (error) => {
@@ -72,3 +31,63 @@ db.once('open', () => {
     console.log(`Server started at ${PORT}`)
   })
 });
+
+app.post("/api/randomimage", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
+  if (!req?.files || !req?.files?.file) {
+    res.send({
+      success: false,
+      message: 'File field is required'
+    });
+  } else {
+    db.collection('images')
+      .insertOne({
+        name: req.files.file.name,
+        size: req.files.file.size,
+        contentType: req.files.file.mimetype,
+        image: new Buffer.from(fs.readFileSync(req.files.file.tempFilePath).toString('base64'), 'base64'),
+      })
+      .then(() => {
+        res.send({
+          success: true,
+          message: 'Image has benn upload successfully'
+        });
+
+        fs.rmSync('./upload', { recursive: true, force: true });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+          message: 'Something went wrong with upload file'
+        });
+      })
+  }
+});
+
+app.get('/api/randomimage', (req, res)=>{
+  res.header("Access-Control-Allow-Origin", "*");
+
+  db.collection('images').find().toArray()
+    .then(collection => {
+      if (!collection.length) {
+        res.send({
+          success: false,
+          message: 'Image collection empty'
+        });
+      } else {
+        const randomImage = collection[Math.floor((Math.random() * collection.length))]
+
+        res.send({
+          success: true,
+          randomImage
+        })
+      }
+    })
+    .catch(() => {
+      res.send({
+        success: false,
+        message: 'Something went wrong with upload file'
+      });
+    })
+})
