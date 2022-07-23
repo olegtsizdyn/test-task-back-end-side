@@ -51,7 +51,7 @@ app.post("/api/randomimage", (req, res) => {
       .then(() => {
         res.send({
           success: true,
-          message: 'Image has benn upload successfully'
+          message: 'Image has ben upload successfully'
         });
 
         fs.rmSync('./upload', { recursive: true, force: true });
@@ -59,13 +59,13 @@ app.post("/api/randomimage", (req, res) => {
       .catch(() => {
         res.send({
           success: false,
-          message: 'Something went wrong with upload file'
+          message: 'Something went wrong with uploading file'
         });
       })
   }
 });
 
-app.get('/api/randomimage', (req, res)=>{
+app.get('/api/randomimage', (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
 
   db.collection('images').find().toArray()
@@ -87,7 +87,25 @@ app.get('/api/randomimage', (req, res)=>{
     .catch(() => {
       res.send({
         success: false,
-        message: 'Something went wrong with upload file'
+        message: 'Something went wrong with getting file'
+      });
+    })
+})
+
+app.delete('/api/randomimage/:id', (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
+  db.collection('images').deleteOne({_id: mongoose.Types.ObjectId(req.params.id)})
+    .then(() => {
+      res.send({
+        success: true,
+        message: 'Image has ben deleted successfully'
+      });
+    })
+    .catch(() => {
+      res.send({
+        success: false,
+        message: 'Something went wrong with deleting file'
       });
     })
 })
