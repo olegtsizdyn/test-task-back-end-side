@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const fileupload = require('express-fileupload');
 const fs = require('fs');
 
-// const MONGO_DB_URL = process.env.DATABASE_URL;
+const MONGO_DB_URL = process.env.DATABASE_URL;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -55,15 +56,15 @@ app.get('/api/randomimage', (req, res)=>{
     })
 })
 
-mongoose.connect(process.env.DATABASE_URL);
+mongoose.connect(MONGO_DB_URL);
 const db = mongoose.connection;
 db.on('error', (error) => {
   console.log(`Connection to database failed`, error)
 });
 db.once('open', () => {
   console.log(`Connection to database successfully`)
-
-  app.listen(3000, () => {
-    console.log(`Server started at ${3000}`)
-  })
 });
+
+app.listen(PORT, () => {
+  console.log(`Server started at ${PORT}`)
+})
