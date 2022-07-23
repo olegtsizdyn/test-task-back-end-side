@@ -63,8 +63,8 @@ db.on('error', (error) => {
 });
 db.once('open', () => {
   console.log(`Connection to database successfully`)
-});
 
-app.listen(PORT, () => {
-  console.log(`Server started at ${PORT}`)
-})
+  app.listen(PORT, () => {
+    console.log(`Server started at ${PORT}`)
+  })
+});
