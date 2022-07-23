@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const fileupload = require('express-fileupload');
+const cors = require('cors');
 const fs = require('fs');
 
 const MONGO_DB_URL = process.env.DATABASE_URL;
@@ -17,6 +18,9 @@ app.use(express.json());
 app.use(fileupload({
   useTempFiles : true,
   tempFileDir : './upload'
+}));
+app.use(cors({
+  origin: 'https://test-task-front-end-side.herokuapp.com'
 }));
 
 mongoose.connect(MONGO_DB_URL);
@@ -33,8 +37,6 @@ db.once('open', () => {
 });
 
 app.post("/api/randomimage", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-
   if (!req?.files || !req?.files?.file) {
     res.send({
       success: false,
@@ -51,7 +53,7 @@ app.post("/api/randomimage", (req, res) => {
       .then(() => {
         res.send({
           success: true,
-          message: 'Image has ben upload successfully'
+          message: 'Image has been upload successfully'
         });
 
         fs.rmSync('./upload', { recursive: true, force: true });
@@ -66,8 +68,6 @@ app.post("/api/randomimage", (req, res) => {
 });
 
 app.get('/api/randomimage', (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-
   db.collection('images').find().toArray()
     .then(collection => {
       if (!collection.length) {
@@ -93,13 +93,17 @@ app.get('/api/randomimage', (req, res) => {
 })
 
 app.delete('/api/randomimage/:id', (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-
-  db.collection('images').deleteOne({_id: mongoose.Types.ObjectId(req.params.id)})
+  if (!req?.params?.id) {
+    res.send({
+      success: false,
+      message: 'Image id is required'
+    });
+  } else {
+    db.collection('images').deleteOne({_id: mongoose.Types.ObjectId(req.params.id)})
     .then(() => {
       res.send({
         success: true,
-        message: 'Image has ben deleted successfully'
+        message: 'Image has been deleted successfully'
       });
     })
     .catch(() => {
@@ -108,4 +112,5 @@ app.delete('/api/randomimage/:id', (req, res) => {
         message: 'Something went wrong with deleting file'
       });
     })
+  }
 })
