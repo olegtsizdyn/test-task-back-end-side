@@ -100,17 +100,17 @@ app.delete('/api/randomimage/:id', (req, res) => {
     });
   } else {
     db.collection('images').deleteOne({_id: mongoose.Types.ObjectId(req.params.id)})
-    .then(() => {
-      res.send({
-        success: true,
-        message: 'Image has been deleted successfully'
-      });
-    })
-    .catch(() => {
-      res.send({
-        success: false,
-        message: 'Something went wrong with deleting file'
-      });
-    })
+      .then(() => {
+        res.send({
+          success: true,
+          message: 'Image has been deleted successfully'
+        });
+      })
+      .catch(() => {
+        res.send({
+          success: false,
+          message: 'Something went wrong with deleting file'
+        });
+      })
   }
 })
