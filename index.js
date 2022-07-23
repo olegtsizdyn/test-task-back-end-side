@@ -20,52 +20,60 @@ app.use(fileupload({
   tempFileDir : './upload'
 }));
 
-app.post("/api/randomimage", (req, res) => {
-  if (!req.files || !req.files.file) {
-    res.send('File field is required');
-    return;
-  }
-
-  db.collection('images')
-    .insertOne({
-      name: req.files.file.name,
-      size: req.files.file.size,
-      contentType: req.files.file.mimetype,
-      image: new Buffer.from(fs.readFileSync(req.files.file.tempFilePath).toString('base64'), 'base64'),
-      url: req.protocol + '://' + req.get("host") + '/images/' + req.files.file.name,
-    })
-    .then(() => {
-      res.send('Image has benn upload successfully');
-
-      fs.rmSync('./upload', { recursive: true, force: true });
-    })
-    .catch(() => {
-      res.send('Something went wrong with upload file');
-    })
-});
-
-
-app.get('/api/randomimage', (req, res)=>{
-  db.collection('images').find().toArray()
-    .then(collection => {
-      randomImage = collection[Math.floor((Math.random() * collection.length))]
-
-      res.send(randomImage)
-    })
-    .catch(() => {
-      res.send('Something went wrong with upload file');
-    })
+app.get('/', (req, res)=>{
+  res.send('Get');
 })
 
-mongoose.connect(MONGO_DB_URL);
-const db = mongoose.connection;
-db.on('error', (error) => {
-  console.log(`Connection to database failed`, error)
-});
-db.once('open', () => {
-  console.log(`Connection to database successfully`)
+app.listen(PORT, () => {
+  console.log(`Server started at ${PORT}`)
+})
 
-  app.listen(PORT, () => {
-    console.log(`Server started at ${PORT}`)
-  })
-});
+// app.post("/api/randomimage", (req, res) => {
+//   if (!req.files || !req.files.file) {
+//     res.send('File field is required');
+//     return;
+//   }
+
+//   db.collection('images')
+//     .insertOne({
+//       name: req.files.file.name,
+//       size: req.files.file.size,
+//       contentType: req.files.file.mimetype,
+//       image: new Buffer.from(fs.readFileSync(req.files.file.tempFilePath).toString('base64'), 'base64'),
+//       url: req.protocol + '://' + req.get("host") + '/images/' + req.files.file.name,
+//     })
+//     .then(() => {
+//       res.send('Image has benn upload successfully');
+
+//       fs.rmSync('./upload', { recursive: true, force: true });
+//     })
+//     .catch(() => {
+//       res.send('Something went wrong with upload file');
+//     })
+// });
+
+
+// app.get('/api/randomimage', (req, res)=>{
+//   db.collection('images').find().toArray()
+//     .then(collection => {
+//       randomImage = collection[Math.floor((Math.random() * collection.length))]
+
+//       res.send(randomImage)
+//     })
+//     .catch(() => {
+//       res.send('Something went wrong with upload file');
+//     })
+// })
+
+// mongoose.connect(MONGO_DB_URL);
+// const db = mongoose.connection;
+// db.on('error', (error) => {
+//   console.log(`Connection to database failed`, error)
+// });
+// db.once('open', () => {
+//   console.log(`Connection to database successfully`)
+
+//   app.listen(PORT, () => {
+//     console.log(`Server started at ${PORT}`)
+//   })
+// });
